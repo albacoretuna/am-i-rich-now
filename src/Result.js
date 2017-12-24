@@ -90,7 +90,7 @@ class Result extends Component {
               <button onClick={() => this.displayDetails()}>Details</button>
               <div className={classNames ("coins-list", {'coins-list__is-hidden': this.state.hideCoinslist} )}>
               <p>
-                Symbl {' '} Subtotal
+                Coin {' '} Subtotal
               </p>
               <ol className="coins-list__ol">
                 {this.props.portfolio.map((x, i) =>

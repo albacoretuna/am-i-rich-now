@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 import './App.css'
 import Result from './Result.js'
+import ManageCoins from './ManageCoins.js'
 
 class App extends Component {
   state = {
@@ -46,8 +48,7 @@ class App extends Component {
 
   getPrices = () =>
     fetch(
-      'https:\/\/api.coinmarketcap.com/v1/ticker/?convert=' +
-        this.state.currency
+      'https://api.coinmarketcap.com/v1/ticker/?convert=' + this.state.currency,
     ).then(data => {
       data.json().then(prices => {
         let portfolio = []
@@ -74,16 +75,23 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <h1 className="App-title">Am I Rich Yet?</h1>
-        <p className="App-intro" />
-        <Result
-          loading={this.state.resultLoading}
-          totalPaid={this.state.totalPaid}
-          portfolio={this.state.portfolio}
-          currency={this.state.currency}
-        />
-      </div>
+      <Router>
+        <div className="App">
+          <h1 className="App-title">Am I Rich Yet?</h1>
+          <Route path="/manage-coins" component={ManageCoins} />
+          <Route
+            path="/"
+            exact
+            render={() =>
+              <Result
+                loading={this.state.resultLoading}
+                totalPaid={this.state.totalPaid}
+                portfolio={this.state.portfolio}
+                currency={this.state.currency}
+              />}
+          />
+        </div>
+      </Router>
     )
   }
 }
