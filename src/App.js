@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
 import './App.css'
+import Result from './Result.js'
 
 class App extends Component {
   state = {
     portfolio: [],
+    currency: 'EUR',
+    totalPaid: 1140,
+    resultLoading: true,
     holding: [
       {
         symbol: 'LTC',
@@ -33,58 +37,52 @@ class App extends Component {
         symbol: 'DOGE',
         quantity: 10943,
       },
+      {
+        symbol: 'XRP',
+        quantity: 128,
+      },
     ],
   }
 
   getPrices = () =>
-    fetch('https://api.coinmarketcap.com/v1/ticker/?convert=eur')
-      .then(data => {
-        data.json().then(something => {
-          this.calculateValue(something)
-          return something
-        })
-    })
-  componentDidMount () {
-    this.getPrices()
-  }
+    fetch(
+      'https:\/\/api.coinmarketcap.com/v1/ticker/?convert=' +
+        this.state.currency
+    ).then(data => {
+      data.json().then(prices => {
+        let portfolio = []
+        this.state.holding.forEach(coin => {
+          let match = prices.filter(price => price.symbol === coin.symbol)[0]
 
-  calculateValue = prices => {
-    this.state.holding.forEach(coin => {
-      let match = prices.filter(price => price.symbol === coin.symbol)[0]
-      this.state.portfolio.push({
-        symbol: match.symbol,
-        subtotal: parseFloat(coin.quantity, 10) * parseFloat(match.price_eur),
+          if (!match) return
+
+          portfolio.push({
+            symbol: match.symbol,
+            subtotal:
+              parseFloat(coin.quantity, 10) * parseFloat(match.price_eur),
+          })
+        })
+        this.setState({
+          portfolio,
+          resultLoading: false,
+        })
       })
     })
-    const reducer = (accumulator, currentValue) =>
-      parseFloat(accumulator, 10) + parseFloat(currentValue.subtotal, 10)
-    let portfolioValue = Math.floor(this.state.portfolio.reduce(reducer, 0))
-    let difference = portfolioValue - 1140
-    document.querySelector(
-      '#sign',
-    ).innerHTML = `<span>${portfolioValue} - 1140 = </span><h1 class="profit-loss">${difference} </h1>`
-
-    if (difference > 0) {
-      document.querySelector('#smily').innerHTML = `
-      <span>Profit yeaaay!</span>
-      <div>
-       <img src="middleparrot.gif" alt="Image description" />
-       <img src="middleparrot.gif" alt="Image description" />
-       <img src="middleparrot.gif" alt="Image description" />
-       <img src="middleparrot.gif" alt="Image description" />
-       <img src="middleparrot.gif" alt="Image description" />
-       <img src="middleparrot.gif" alt="Image description" />
-     </div>
-`
-    } else {
-      document.querySelector('#smily').innerHTML = 'loss:('
-    }
+  componentDidMount() {
+    this.getPrices()
   }
 
   render() {
     return (
       <div className="App">
-        <h1 className="App-title">Am I Rich Now?</h1>
+        <h1 className="App-title">Am I Rich Yet?</h1>
+        <p className="App-intro" />
+        <Result
+          loading={this.state.resultLoading}
+          totalPaid={this.state.totalPaid}
+          portfolio={this.state.portfolio}
+          currency={this.state.currency}
+        />
       </div>
     )
   }
