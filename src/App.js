@@ -46,6 +46,12 @@ class App extends Component {
     ],
   }
 
+  setHoldings = holding => {
+    this.setState({ holding })
+
+    // refresh the profit/loss
+    this.getPrices()
+  }
   getPrices = () =>
     fetch(
       'https://api.coinmarketcap.com/v1/ticker/?convert=' + this.state.currency,
@@ -59,6 +65,7 @@ class App extends Component {
 
           portfolio.push({
             symbol: match.symbol,
+            quantity: coin.quantity,
             subtotal:
               parseFloat(coin.quantity, 10) * parseFloat(match.price_eur),
           })
@@ -78,7 +85,22 @@ class App extends Component {
       <Router>
         <div className="App">
           <h1 className="App-title">Am I Rich Yet?</h1>
-          <Route path="/manage-coins" component={ManageCoins} />
+          <ul>
+            <li>
+              <Link to="/manage-coins">manage coins</Link>
+            </li>
+            <li>
+              <Link to="/">home</Link>
+            </li>
+          </ul>
+          <Route
+            path="/manage-coins"
+            render={() =>
+              <ManageCoins
+                portfolio={this.state.portfolio}
+                setHoldings={this.setHoldings}
+              />}
+          />
           <Route
             path="/"
             exact
