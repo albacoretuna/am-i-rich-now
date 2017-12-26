@@ -53,6 +53,12 @@ class App extends Component {
       })
     })
   componentDidMount() {
+    if(get(this, 'state.holding.length') < 1) {
+      this.setState({
+        resultLoading: false,
+      })
+      return
+    }
     this.getPrices()
   }
 
@@ -120,7 +126,13 @@ class App extends Component {
             path="/help"
             component={Help}
           />
+          <footer className="footer">
+            <p>
+              <a href="https://AmIRichNow.com">AmIRichNow.com</a> Track how much your cryptocurrencies have made you richer, or poorer.
+            </p>
+          </footer>
         </div>
+
       </Router>
     )
   }

@@ -10,24 +10,46 @@ class ManageCoins extends Component {
     value: this.props.portfolio.map(coin => coin.symbol).join(','),
     stayOpen: true,
     portfolio: this.props.portfolio,
-    changesSaved: false
+    changesSaved: false,
+    saveError: '',
+    coinValueError: ''
   }
 
   handleSelectChange = value => {
     this.setState({ value })
   }
 
+  resetValidationError = () => {
+    this.setState({
+      saveError: '',
+      coinValueError: ''
+    })
+  }
+
   // sets the number of coins that user holds into app state
   saveChanges = coinsSymbols => {
+    this.resetValidationError()
+
+    if(parseFloat(this.totalPaid.value, 10) <= 0) {
+      this.setState({saveError: 'Total paid should be more than zero.'})
+       return;
+    }
     let coins = coinsSymbols.split(',')
     let holding = coins.length > 0 && coins.map(symbol => {
+      let quantity = get(this[symbol], 'value')
+      if(quantity <= 0) {
+        this.setState({
+          coinValueError: 'Quantity should be more than zero'
+        })
+      }
       return {
-        quantity: get(this[symbol], 'value') ,
+        quantity ,
         symbol,
       }
     })
     this.props.setHolding(holding)
-    this.props.setTotalPaid(this.totalPaid.value)
+
+    this.props.setTotalPaid(parseFloat(this.totalPaid.value, 10))
 
     // save to localStorage
     window.localStorage.setItem(
@@ -50,12 +72,16 @@ class ManageCoins extends Component {
       <li className="coins-form__li" key={i}>
         <label htmlFor={symbol} className="coins-form__label">
           {' '}{symbol}:{' '}
+          {this.state.coinValueError &&
+              <span className="form-validation-error">{this.state.coinValueError}</span>
+          }
         </label>
         <input
           type="number"
           placeholder="for example 3 or 0.43"
           className="coins-form__input"
           ref={input => (this[symbol] = input)}
+          min="0.000001"
           defaultValue={
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0] &&
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0]
@@ -108,6 +134,10 @@ class ManageCoins extends Component {
           <div className="coins-form__div">
           <label htmlFor="total" className="coins-form__label">
             Total amount paid for your coins ({this.props.currency}):
+
+            {this.state.saveError &&
+                <span className="form-validation-error">{this.state.saveError}</span>
+            }
           </label>
           <input
             type="number"
@@ -115,6 +145,7 @@ class ManageCoins extends Component {
             ref={input => (this.totalPaid = input)}
             defaultValue={this.props.totalPaid}
             className="coins-form__input"
+            min="0.000001"
           />
         </div>
           { this.state.changesSaved &&

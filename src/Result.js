@@ -3,20 +3,22 @@ import { FormattedNumber, IntlProvider } from 'react-intl'
 import loadingIcon from './loading.svg'
 import middleparrot from './middleparrot.gif'
 import sadparrot from './sadparrot.gif'
-import classNames from 'classnames';
+import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 
 class Result extends Component {
   state = {
-    "hideCoinslist" : true
+    hideCoinslist: true,
   }
+
+  // outputs between 1 to 31 happy or sad party parrots
   renderParrots = (difference, totalPaid) => {
     if (!difference || !totalPaid) return
     let profit = difference > 0
-    let parrotQuantity = difference / totalPaid
-    return [
-      ...Array(Math.ceil(Math.abs(parseInt(parrotQuantity, 10))) + 1),
-    ].map((x, i) =>
+    let parrotQuantity =
+      Math.min(Math.ceil(Math.abs(parseInt(difference / totalPaid, 10))), 30) +
+      1
+    return [...Array(parrotQuantity)].map((x, i) =>
       <img
         src={profit ? middleparrot : sadparrot}
         alt="Party parrot"
@@ -26,13 +28,14 @@ class Result extends Component {
   }
 
   renderResult = portfolio => {
-
-    if(  portfolio.length < 1 ) {
+    if (portfolio.length < 1) {
       return (
         <div>
           Start by adding your coins:
-              <Link className="result__link" to="/manage-coins">manage coins</Link>
-            </div>
+          <Link className="result__link" to="/manage-coins">
+            manage coins
+          </Link>
+        </div>
       )
     }
 
@@ -51,7 +54,9 @@ class Result extends Component {
               currency={this.props.currency}
             />
           </IntlProvider>
-          <span className="profit-loss__span">{difference > 0 ? 'profit' : 'loss'}</span>
+          <span className="profit-loss__span">
+            {difference > 0 ? 'profit' : 'loss'}
+          </span>
         </h1>
         <span className="calculation">
           (Current total worth of coins)<IntlProvider locale="en">
@@ -61,8 +66,7 @@ class Result extends Component {
               currency={this.props.currency}
             />
           </IntlProvider>{' '}
-          - {' '}
-           <br />
+          -  <br />
           (What you paid to buy them)
           <IntlProvider locale="en">
             <FormattedNumber
@@ -84,53 +88,59 @@ class Result extends Component {
               No you should be poorer now. You lost some.
             </span>
           </div>}
-              <button className="result__button" onClick={() => this.displayDetails()}>Details</button>
+        <button
+          className="result__button"
+          onClick={() => this.displayDetails()}
+        >
+          Details
+        </button>
       </div>
     )
   }
   displayDetails = () => {
-    this.setState({'hideCoinslist': !this.state.hideCoinslist})
+    this.setState({ hideCoinslist: !this.state.hideCoinslist })
   }
 
   render() {
     return (
       <div className="result">
-        {this.props.loading
+        {!this.props.loading
           ? <span className="loader">
               <img src={loadingIcon} alt="loading spinner" />Loading...
             </span>
           : <div>
               {this.renderResult(this.props.portfolio)}
-              <div className={classNames ("coins-list", {'coins-list__is-hidden': this.state.hideCoinslist} )}>
-              <p>
-                Coin {' | ' } Quantity {' | '} Subtotal
-              </p>
-              <div>
-              <Link to="/manage-coins">manage coins</Link>
+              <div
+                className={classNames('coins-list', {
+                  'coins-list__is-hidden': this.state.hideCoinslist,
+                })}
+              >
+                <p>
+                  Coin {' | '} Quantity {' | '} Subtotal
+                </p>
+                <div>
+                  <Link to="/manage-coins">manage coins</Link>
+                </div>
+                <ol className="coins-list__ol">
+                  {this.props.portfolio.map((x, i) =>
+                    <li className="coins-list__li" key={i}>
+                      <span className="coins-list__span">
+                        {x.symbol}   {x.quantity}
+                      </span>{' '}
+                      {' '}
+                      <span className="coins-list__span--currency">
+                        <IntlProvider locale="en">
+                          <FormattedNumber
+                            value={x.subtotal}
+                            style="currency"
+                            currency={this.props.currency}
+                          />
+                        </IntlProvider>
+                      </span>
+                    </li>,
+                  )}
+                </ol>
               </div>
-              <ol className="coins-list__ol">
-                {this.props.portfolio.map((x, i) =>
-                  <li className="coins-list__li" key={i}>
-                    <span className="coins-list__span">
-                      {x.symbol} {' '} {x.quantity}
-                    </span>  {' '}
-                    <span
-                      className="coins-list__span--currency"
-                    >
-                    <IntlProvider
-                      locale="en">
-                      <FormattedNumber
-                        value={x.subtotal}
-                        style="currency"
-                        currency={this.props.currency}
-                      />
-                    </IntlProvider>
-                  </span>
-
-                  </li>,
-                )}
-              </ol>
-            </div>
             </div>}
       </div>
     )

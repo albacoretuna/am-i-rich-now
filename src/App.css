@@ -4,6 +4,9 @@
   max-width: 350px;
   margin: 0 auto;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 #root {
   height: 100%;
@@ -54,11 +57,13 @@ html, body{
 
 .loader {
   position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   color: white;
-  left: 0;
-  width: 100vw;
+  width: 50vw;
   font-size: 30px;
-  background-color: rgba(0,0,150, .5);
+  background-color: rgba(101, 132, 163, 0.5);
   padding: 10px;
 }
 
@@ -222,4 +227,16 @@ html, body{
   padding: 10px;
   text-decoration: none;
   font-size: 18px;
+}
+
+
+.footer {
+  color: #3c5f84;
+}
+
+
+.form-validation-error {
+  color: red;
+  display:block;
+  font-size: 12px;
 }
