@@ -1,8 +1,8 @@
 {
-  "short_name": "Am I Rich Yet",
-  "name": "Am I Rich Yet",
-  "start_url": "./index.html",
+  "name": "Am I Rich Now",
+  "short_name": "AmIRichNow",
+  "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "background_color": "#fff",
+  "description": "Am I Rich Now?"
 }
