@@ -1,57 +1,33 @@
 import React, { Component } from 'react'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom'
+import {get } from 'lodash'
 import './App.css'
 import Result from './Result.js'
 import ManageCoins from './ManageCoins.js'
+import Help from './Help.js'
 
 class App extends Component {
   state = {
     portfolio: [],
     currency: 'EUR',
-    totalPaid: 1140,
+    totalPaid: get( JSON.parse(localStorage.getItem('state')), 'totalPaid') || 0,
     resultLoading: true,
-    holding: [
-      {
-        symbol: 'LTC',
-        quantity: 0.9569,
-      },
-      {
-        symbol: 'ETH',
-        quantity: 0.4141,
-      },
-      {
-        symbol: 'ADA',
-        quantity: 556,
-      },
-      {
-        symbol: 'GNT',
-        quantity: 231,
-      },
-      {
-        symbol: 'DGB',
-        quantity: 3023,
-      },
-      {
-        symbol: 'XMR',
-        quantity: 0.276,
-      },
-      {
-        symbol: 'DOGE',
-        quantity: 10943,
-      },
-      {
-        symbol: 'XRP',
-        quantity: 128,
-      },
-    ],
+    holding: get(JSON.parse(localStorage.getItem('state')), 'holding')  || [],
   }
 
-  setHoldings = holding => {
+  setHolding = holding => {
     this.setState({ holding })
+  }
+
+  // set the total amount in the currency user has paid for the coins
+  setTotalPaid = totalPaid => {
+    this.setState({ totalPaid })
 
     // refresh the profit/loss
     this.getPrices()
   }
+
+  // gets 100 top coins prices from coinmarketcap api
   getPrices = () =>
     fetch(
       'https://api.coinmarketcap.com/v1/ticker/?convert=' + this.state.currency,
@@ -84,21 +60,49 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <h1 className="App-title">Am I Rich Yet?</h1>
-          <ul>
-            <li>
-              <Link to="/manage-coins">manage coins</Link>
+          <ul className="menue">
+            <li className="menue__li">
+              <NavLink
+                exact={true}
+                className="menue__link"
+                activeClassName="menue__link--active"
+                to="/"
+              >
+                Home
+              </NavLink>{' '}
+              {' '}
             </li>
-            <li>
-              <Link to="/">home</Link>
+            <li className="menue__li">
+              |{' '}
+              <NavLink
+                className="menue__link"
+                activeClassName="menue__link--active"
+                to="/manage-coins"
+              >
+                Manage coins
+              </NavLink>
+            </li>
+            <li className="menue__li">
+              |{' '}
+              <NavLink
+                className="menue__link"
+                activeClassName="menue__link--active"
+                to="/help"
+              >
+                Help
+              </NavLink>
             </li>
           </ul>
+          <h1 className="App-title">Am I Rich Now?</h1>
           <Route
             path="/manage-coins"
             render={() =>
               <ManageCoins
                 portfolio={this.state.portfolio}
-                setHoldings={this.setHoldings}
+                setHolding={this.setHolding}
+                totalPaid={this.state.totalPaid}
+                setTotalPaid={this.setTotalPaid}
+                currency= {this.state.currency}
               />}
           />
           <Route
@@ -111,6 +115,10 @@ class App extends Component {
                 portfolio={this.state.portfolio}
                 currency={this.state.currency}
               />}
+          />
+          <Route
+            path="/help"
+            component={Help}
           />
         </div>
       </Router>

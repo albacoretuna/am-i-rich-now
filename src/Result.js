@@ -4,12 +4,14 @@ import loadingIcon from './loading.svg'
 import middleparrot from './middleparrot.gif'
 import sadparrot from './sadparrot.gif'
 import classNames from 'classnames';
+import { Link } from 'react-router-dom'
 
 class Result extends Component {
   state = {
     "hideCoinslist" : true
   }
   renderParrots = (difference, totalPaid) => {
+    if (!difference || !totalPaid) return
     let profit = difference > 0
     let parrotQuantity = difference / totalPaid
     return [
@@ -24,6 +26,16 @@ class Result extends Component {
   }
 
   renderResult = portfolio => {
+
+    if(  portfolio.length < 1 ) {
+      return (
+        <div>
+          Start by adding your coins:
+              <Link className="result__link" to="/manage-coins">manage coins</Link>
+            </div>
+      )
+    }
+
     const reducer = (accumulator, currentValue) =>
       parseFloat(accumulator, 10) + parseFloat(currentValue.subtotal, 10)
 
@@ -31,6 +43,36 @@ class Result extends Component {
     let difference = portfolioValue - this.props.totalPaid
     return (
       <div>
+        <h1 className="profit-loss">
+          <IntlProvider locale="en">
+            <FormattedNumber
+              value={difference}
+              style="currency"
+              currency={this.props.currency}
+            />
+          </IntlProvider>
+          <span className="profit-loss__span">{difference > 0 ? 'profit' : 'loss'}</span>
+        </h1>
+        <span className="calculation">
+          (Current total worth of coins)<IntlProvider locale="en">
+            <FormattedNumber
+              value={portfolioValue}
+              style="currency"
+              currency={this.props.currency}
+            />
+          </IntlProvider>{' '}
+          - {' '}
+           <br />
+          (What you paid to buy them)
+          <IntlProvider locale="en">
+            <FormattedNumber
+              value={this.props.totalPaid}
+              style="currency"
+              currency={this.props.currency}
+            />
+          </IntlProvider>{' '}
+        </span>
+        {this.renderParrots(difference, this.props.totalPaid)}
         {difference > 0 &&
           <div>
             <span className="verdict">Maybe! You've made some profit</span>
@@ -42,35 +84,7 @@ class Result extends Component {
               No you should be poorer now. You lost some.
             </span>
           </div>}
-        {this.renderParrots(difference, this.props.totalPaid)}
-
-        <span className="calculation">
-          <IntlProvider locale="en">
-            <FormattedNumber
-              value={portfolioValue}
-              style="currency"
-              currency={this.props.currency}
-            />
-          </IntlProvider>{' '}
-          - {' '}
-          <IntlProvider locale="en">
-            <FormattedNumber
-              value={this.props.totalPaid}
-              style="currency"
-              currency={this.props.currency}
-            />
-          </IntlProvider>{' '}
-          = {' '}
-        </span>
-        <h1 className="profit-loss">
-          <IntlProvider locale="en">
-            <FormattedNumber
-              value={difference}
-              style="currency"
-              currency={this.props.currency}
-            />
-          </IntlProvider>
-        </h1>
+              <button className="result__button" onClick={() => this.displayDetails()}>Details</button>
       </div>
     )
   }
@@ -80,30 +94,38 @@ class Result extends Component {
 
   render() {
     return (
-      <div className="Result">
+      <div className="result">
         {this.props.loading
           ? <span className="loader">
               <img src={loadingIcon} alt="loading spinner" />Loading...
             </span>
           : <div>
               {this.renderResult(this.props.portfolio)}
-              <button onClick={() => this.displayDetails()}>Details</button>
               <div className={classNames ("coins-list", {'coins-list__is-hidden': this.state.hideCoinslist} )}>
               <p>
-                Coin {' '} Subtotal
+                Coin {' | ' } Quantity {' | '} Subtotal
               </p>
+              <div>
+              <Link to="/manage-coins">manage coins</Link>
+              </div>
               <ol className="coins-list__ol">
                 {this.props.portfolio.map((x, i) =>
                   <li className="coins-list__li" key={i}>
-                    {x.symbol}{' '}
-
-                    <IntlProvider locale="en">
+                    <span className="coins-list__span">
+                      {x.symbol} {' '} {x.quantity}
+                    </span>  {' '}
+                    <span
+                      className="coins-list__span--currency"
+                    >
+                    <IntlProvider
+                      locale="en">
                       <FormattedNumber
                         value={x.subtotal}
                         style="currency"
                         currency={this.props.currency}
                       />
                     </IntlProvider>
+                  </span>
 
                   </li>,
                 )}

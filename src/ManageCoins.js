@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import Select from 'react-select'
 import 'react-select/dist/react-select.css'
+import { get } from 'lodash'
+import { Link } from 'react-router-dom'
 
 class ManageCoins extends Component {
   state = {
@@ -8,41 +10,63 @@ class ManageCoins extends Component {
     value: this.props.portfolio.map(coin => coin.symbol).join(','),
     stayOpen: true,
     portfolio: this.props.portfolio,
+    changesSaved: false
   }
 
   handleSelectChange = value => {
     this.setState({ value })
   }
 
-  saveChanges = (coinsSymbols) => {
+  // sets the number of coins that user holds into app state
+  saveChanges = coinsSymbols => {
     let coins = coinsSymbols.split(',')
-    this.props.setHoldings(coins.map((symbol) => {
+    let holding = coins.length > 0 && coins.map(symbol => {
       return {
-       quantity:this[symbol].value,
-       symbol
+        quantity: get(this[symbol], 'value') ,
+        symbol,
       }
-    }))
-    console.log(coins, 'bolo')
+    })
+    this.props.setHolding(holding)
+    this.props.setTotalPaid(this.totalPaid.value)
+
+    // save to localStorage
+    window.localStorage.setItem(
+      'state',
+      JSON.stringify({
+        holding,
+        totalPaid: this.totalPaid.value,
+      }),
+    )
+
+    // show confirmation message
+    this.setState({changesSaved : true})
   }
 
+  // for each selected coin, adds a row with symbol and quantity input box
   renderQuantityForm = coinsList => {
     if (coinsList.length < 1) return
     let coins = coinsList.split(',')
     return coins.map((symbol, i) =>
-      <p key={i}>
-        {symbol}:{' '}
+      <li className="coins-form__li" key={i}>
+        <label htmlFor={symbol} className="coins-form__label">
+          {' '}{symbol}:{' '}
+        </label>
         <input
           type="number"
-          ref={(input) => this[symbol] = input }
+          placeholder="for example 3 or 0.43"
+          className="coins-form__input"
+          ref={input => (this[symbol] = input)}
           defaultValue={
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0] &&
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0]
               .quantity
           }
         />
-      </p>,
+      </li>,
     )
   }
+
+  // reads the number of coins user holds from the app state
   componentWillReceiveProps(props) {
     this.setState({ portfolio: props.portfolio }, () => {
       this.setState({
@@ -56,23 +80,57 @@ class ManageCoins extends Component {
       <div className="ManageCoins">
         <h2> Manage Coins </h2>
         <div>
-          <p> 1. Select all the different coins that you own</p>
-          <Select
-            closeOnSelect={!stayOpen}
-            options={supportedCoins}
-            multi
-            onChange={this.handleSelectChange}
-            placeholder="Select all the coins you own, eg: Bitcoin, Litecoin,..."
-            removeSelected={true}
-            simpleValue
-            value={value}
-          />
+          <p className="instruction">
+            {' '}1. Select all the different coins that you own
+          </p>
+          <div className="select-wrapper">
+            <Select
+              closeOnSelect={!stayOpen}
+              options={supportedCoins}
+              multi
+              onChange={this.handleSelectChange}
+              placeholder="Select all the coins you own, eg: Bitcoin, Litecoin,..."
+              removeSelected={true}
+              simpleValue
+              value={value}
+            />
+          </div>
         </div>
 
         <div>
-          <p> 2. Specify how many coins you own</p>
-          {this.renderQuantityForm(this.state.value)}
-          <button onClick={() => {this.saveChanges(this.state.value)} }>Save Changes</button>
+          <p className="instruction"> 2. Specify how many coins you own</p>
+          <ul className="coins-form">
+            {this.renderQuantityForm(this.state.value)}
+          </ul>
+          <p className="instruction">
+            {' '}3. Specify how much you have paid in total and save!
+          </p>
+          <div className="coins-form__div">
+          <label htmlFor="total" className="coins-form__label">
+            Total amount paid for your coins ({this.props.currency}):
+          </label>
+          <input
+            type="number"
+            name="total"
+            ref={input => (this.totalPaid = input)}
+            defaultValue={this.props.totalPaid}
+            className="coins-form__input"
+          />
+        </div>
+          { this.state.changesSaved &&
+          <p className="coins-form__p">
+            ✓ All Changes Saved!
+            <Link to="/"> { ' ' } Go to home </Link>
+          </p>
+          }
+          <button
+            className="coins-form__button"
+            onClick={() => {
+              this.saveChanges(this.state.value)
+            }}
+          >
+            Save Changes
+          </button>
         </div>
       </div>
     )
@@ -81,7 +139,7 @@ class ManageCoins extends Component {
 
 export default ManageCoins
 
-// a list of 100 cyrpto coin names and symbols
+// a list of 100 cyrpto coin names and symbols, the top 100 top coins at the moment
 const supportedCoins = [
   {
     value: 'BTC',
