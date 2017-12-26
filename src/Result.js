@@ -104,7 +104,7 @@ class Result extends Component {
   render() {
     return (
       <div className="result">
-        {!this.props.loading
+        {this.props.loading
           ? <span className="loader">
               <img src={loadingIcon} alt="loading spinner" />Loading...
             </span>
