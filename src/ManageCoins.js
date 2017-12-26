@@ -81,7 +81,6 @@ class ManageCoins extends Component {
           placeholder="for example 3 or 0.43"
           className="coins-form__input"
           ref={input => (this[symbol] = input)}
-          min="0.000001"
           defaultValue={
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0] &&
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0]
@@ -145,7 +144,6 @@ class ManageCoins extends Component {
             ref={input => (this.totalPaid = input)}
             defaultValue={this.props.totalPaid}
             className="coins-form__input"
-            min="0.000001"
           />
         </div>
           { this.state.changesSaved &&
