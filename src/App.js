@@ -79,7 +79,7 @@ class App extends Component {
                 activeClassName="menue__link--active"
                 to="/manage-coins"
               >
-                Manage coins
+                 Manage coins {' '}
               </NavLink>
             </li>
             <li className="menue__li">

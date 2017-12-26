@@ -13,6 +13,7 @@ class Help extends Component {
           This is a hobby project released under MIT license. Its information is not to be exact or helpful, use it at your own risk.
           <h4>Source code</h4>
           The full source code is available on github.
+          <a href="https://github.com/omidfi/am-i-rich-now">github repository</a>
         </div>
       </div>
 
