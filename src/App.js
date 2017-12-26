@@ -129,6 +129,7 @@ class App extends Component {
           <footer className="footer">
             <p>
               <a href="https://AmIRichNow.com">AmIRichNow.com</a> Track how much your cryptocurrencies have made you richer, or poorer.
+              Source code on <a href="https://github.com/omidfi/am-i-rich-now">github.</a>
             </p>
           </footer>
         </div>

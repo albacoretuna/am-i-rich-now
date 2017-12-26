@@ -6,6 +6,9 @@ class Help extends Component {
       <div className="Help">
         <h2> Help </h2>
         <div>
+          <h4>What is this?</h4>
+          A simple web app, where you specify how many crypto-coins you own, and how much you've paid for them, to see at the current rate if you've made any profit or loss.
+
           <h4>Privacy</h4>
           We don't save anything on our servers, everything including the number of coins you own are stored in your browser.          Search the internet for LocalStorage to see what is saved, or how to delete it.
 
