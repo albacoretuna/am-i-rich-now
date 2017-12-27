@@ -81,6 +81,8 @@ class ManageCoins extends Component {
           placeholder="for example 3 or 0.43"
           className="coins-form__input"
           ref={input => (this[symbol] = input)}
+          min={0}
+          step="any"
           defaultValue={
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0] &&
             this.state.portfolio.filter(coin => coin.symbol === symbol)[0]
@@ -141,6 +143,8 @@ class ManageCoins extends Component {
           <input
             type="number"
             name="total"
+            min={0}
+            step="any"
             ref={input => (this.totalPaid = input)}
             defaultValue={this.props.totalPaid}
             className="coins-form__input"
