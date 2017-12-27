@@ -203,14 +203,18 @@ html, body{
 /* result component */
 
 .result__button {
+    display: block;
+    margin: 10px auto;
     max-width: 100px;
     width: 100%;
-    margin: 10px 0 30px 0;
     background: #007eff;
     border: #007eff;
     padding: 10px;
     color: white;
     font-size: 14px;
+}
+.result__button--refresh {
+    background: green;
 }
 
 .result__link {

@@ -120,6 +120,7 @@ class App extends Component {
                 totalPaid={this.state.totalPaid}
                 portfolio={this.state.portfolio}
                 currency={this.state.currency}
+                refresh={this.getPrices}
               />}
           />
           <Route

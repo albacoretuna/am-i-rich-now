@@ -58,6 +58,12 @@ class Result extends Component {
             {difference > 0 ? 'profit' : 'loss'}
           </span>
         </h1>
+        <button
+          className="result__button result__button--refresh"
+          onClick={() => this.props.refresh()}
+        >
+          Refresh
+        </button>
         <span className="calculation">
           (Current total worth of coins)<IntlProvider locale="en">
             <FormattedNumber
